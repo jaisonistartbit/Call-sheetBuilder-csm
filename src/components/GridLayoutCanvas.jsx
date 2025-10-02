@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Plus, Grid3x3, Download } from 'lucide-react';
 import GridLayout from 'react-grid-layout';
 import GridContainer from './GridContainer';
@@ -10,13 +10,14 @@ import 'react-resizable/css/styles.css';
 const GridLayoutCanvas = () => {
   const gridRef = useRef(null);
   const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
+  const [gridWidth, setGridWidth] = useState(1200);
 
   const [containers, setContainers] = useState([
     {
       id: '1',
       x: 0,
       y: 0,
-      w: 4,
+      w: 6,
       h: 4,
       title: 'Welcome Container',
       content: 'This is a draggable and resizable container. Click the + icon to add nested containers!',
@@ -24,9 +25,9 @@ const GridLayoutCanvas = () => {
     },
     {
       id: '2',
-      x: 4,
+      x: 6,
       y: 0,
-      w: 8,
+      w: 6,
       h: 12,
       contentType: 'table',
       title: 'Data Table',
@@ -37,7 +38,7 @@ const GridLayoutCanvas = () => {
       id: '3',
       x: 0,
       y: 4,
-      w: 4,
+      w: 6,
       h: 3,
       title: 'Analytics Dashboard',
       content: 'Monitor your key performance indicators in real-time.',
@@ -46,6 +47,19 @@ const GridLayoutCanvas = () => {
   ]);
 
   const [nextId, setNextId] = useState(4);
+
+  useEffect(() => {
+    const updateGridWidth = () => {
+      if (gridRef.current) {
+        const containerWidth = gridRef.current.offsetWidth;
+        setGridWidth(containerWidth - 48); // Subtract padding
+      }
+    };
+
+    updateGridWidth();
+    window.addEventListener('resize', updateGridWidth);
+    return () => window.removeEventListener('resize', updateGridWidth);
+  }, []);
 
   const generateSampleData = (id) => {
     const titles = [
@@ -395,7 +409,7 @@ const GridLayoutCanvas = () => {
             layout={layout}
             cols={12}
             rowHeight={50}
-            width={1400}
+            width={gridWidth}
             onLayoutChange={handleLayoutChange}
             compactType="vertical"
             preventCollision={true}
